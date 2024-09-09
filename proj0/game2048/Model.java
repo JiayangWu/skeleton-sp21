@@ -137,7 +137,10 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i ++)
+            for (int j = 0; j < b.size(); j ++)
+                if (b.tile(i, j) == null)
+                    return true;
         return false;
     }
 
@@ -147,7 +150,10 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i ++)
+            for (int j = 0; j < b.size(); j ++)
+                if (b.tile(i, j) != null && b.tile(i, j).value() == Model.MAX_PIECE)
+                    return true;
         return false;
     }
 
@@ -158,10 +164,28 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        if (emptySpaceExists(b))
+            return true;
+        int[] dx = {1, -1, 0, 0};
+        int[] dy = {0, 0, 1, -1};
+        int x, y;
+        for (int i = 0; i < b.size(); i ++)
+            for (int j = 0; j < b.size(); j ++)
+                for (int k = 0; k < 4; k++)
+                {
+                    x = i + dx[k];
+                    y = j + dy[k];
+                    if (isValidPos(b.size(), x, y)) {
+                        if (b.tile(x, y).value() == b.tile(i, j).value())
+                            return true;
+                    }
+                }
         return false;
     }
 
+    private static boolean isValidPos(int size, int x, int y) {
+        return (x >= 0 && x < size) && (y >= 0 && y < size);
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
