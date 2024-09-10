@@ -113,12 +113,61 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        board.setViewingPerspective(side);
+        for (int col = 0; col < 4; col ++){
+            if (moveUp(board, col)) {
+                changed = true;
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    private boolean moveUp(Board board, int col) {
+        int col_score = 0;
+        boolean moved = false;
+        int merged = 4;
+        for (int row = 2; row >= 0; row--){
+            Tile t = board.tile(col, row);
+            if (t == null){
+                continue;
+            }
+            System.out.println(col);
+            System.out.println(row);
+            System.out.println(merged);
+            // the last empty tile and the first tile whose values are equal
+            int prevRow = row + 1;
+            int lastEmptyRow = -1;
+            for (; prevRow <= 3 && prevRow < merged; prevRow++){
+                Tile prevT = board.tile(col, prevRow);
+                if (prevT == null){
+                    lastEmptyRow = prevRow;
+                } else {
+                    break;
+                }
+            }
+            if (prevRow == 4 || prevRow == merged) {
+                prevRow -= 1;
+            }
+            System.out.println(prevRow);
+            Tile prevT = board.tile(col, prevRow);
+
+            if (prevT != null && prevT.value() == t.value()) {
+                board.move(col, prevRow, t);
+                score += board.tile(col, prevRow).value();
+                moved = true;
+                merged = prevRow;
+            } else if (lastEmptyRow < 4 && lastEmptyRow >= 0 && board.tile(col, lastEmptyRow) == null){
+                board.move(col, lastEmptyRow, t);
+                moved = true;
+            }
+            System.out.println(board.toString());
+        }
+        return moved;
     }
 
     /** Checks if the game is over and sets the gameOver variable
